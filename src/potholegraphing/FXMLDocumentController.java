@@ -7,10 +7,12 @@ package potholegraphing;
 
 import com.google.gson.Gson;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Scanner;
+import java.util.TreeMap;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.BarChart;
@@ -53,13 +55,30 @@ public class FXMLDocumentController implements Initializable {
 
         Gson gson = new Gson();
         Pothole[] potholes = gson.fromJson(str, Pothole[].class);
-        Map<int, int> holes = new Map<int, int>();
         
+        Map<Integer, Integer> holes = new TreeMap<Integer, Integer>();
+
         for(Pothole p : potholes){
-            
+            Integer zip = p.getZip();
+            boolean complete = p.completed();
+            if(zip > 60000 && complete){
+                if(! holes.containsKey(zip)) {
+                    holes.put(zip, 1);
+                }
+                Integer zipCount = holes.get(zip);
+                holes.put(zip, zipCount + 1);
+            }
         }
 
-        XYChart.Series<int, int> filledHoles = new XYChart.Series();
+        XYChart.Series<String, Integer> filledHoles = new XYChart.Series();
+        filledHoles.setName("# Filled Potholes");
+        Object[] keys = holes.keySet().toArray();
+        Arrays.sort(keys);
+        for(Object zip : keys){
+            filledHoles.getData().add(new XYChart.Data(zip.toString(), holes.get(zip)));
+        }
+        
+        chart.getData().add(filledHoles);
 
         
     }    
