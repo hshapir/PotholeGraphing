@@ -13,10 +13,15 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 import java.util.TreeMap;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 
 /**
  *
@@ -24,6 +29,26 @@ import javafx.scene.chart.XYChart;
  */
 public class FXMLDocumentController implements Initializable {
     
+    @FXML
+    private MenuBar topMenu;
+    
+    @FXML
+    private void handleCloseButtonAction(ActionEvent event) {
+        Platform.exit();
+    }
+    
+    @FXML
+    
+    private void handleAboutButtonAction(ActionEvent event){
+        Alert aboutAlert = new Alert(Alert.AlertType.INFORMATION);
+        aboutAlert.setTitle("About this Program");
+        aboutAlert.setHeaderText(null);
+        aboutAlert.setContentText("I made this program for an AP Computer Science class. It is meant to show polio vaccination percentages from 1980. If you've come across this on GitHub and you're not Mr. Wheadon, I'm not really sure why you're looking at this. Enjoy!");
+        aboutAlert.showAndWait();
+    }
+    
+    @FXML
+    private MenuItem closeButton, aboutButton;
     
     @FXML
     private BarChart chart;
