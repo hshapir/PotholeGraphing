@@ -14,12 +14,17 @@ import java.util.ResourceBundle;
 import java.util.Scanner;
 import java.util.TreeMap;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 
@@ -27,7 +32,7 @@ import javafx.scene.control.MenuItem;
  *
  * @author csstudent
  */
-public class FXMLDocumentController implements Initializable {
+public class FXMLDocumentController implements Initializable, ChangeListener<String> {
     
     @FXML
     private MenuBar topMenu;
@@ -51,10 +56,30 @@ public class FXMLDocumentController implements Initializable {
     private MenuItem closeButton, aboutButton;
     
     @FXML
+    private ChoiceBox filterChoice;
+    
+    public void changed(ObservableValue ov, String value, String newValue){
+        Settings.setFilterValue(newValue);
+        updateGraph(newValue);
+    }
+    
+    @FXML
     private BarChart chart;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        filterChoice.setItems(FXCollections.observableArrayList("All", "2011", "2012", "2013"));
+        filterChoice.setValue("All");
+        filterChoice.getSelectionModel().selectedItemProperty().addListener(this);
+        if(Settings.getPotholes() == null){
+            refreshData();
+        } else {
+            updateGraph(filterChoice.getValue().toString());
+        }
+        
+    }    
+    
+    public void refreshData(){
         String s = "https://data.cityofchicago.org/resource/7as2-ds3y.json?$select=zip,completion_date,status";
         URL myUrl = null;
         try{
@@ -80,18 +105,35 @@ public class FXMLDocumentController implements Initializable {
 
         Gson gson = new Gson();
         Pothole[] potholes = gson.fromJson(str, Pothole[].class);
-        
+        Settings.setPotholes(potholes);
+        updateGraph(filterChoice.getValue().toString());
+    }
+    
+    
+    public void updateGraph(String newFilter){
+        chart.getData().clear();
         Map<Integer, Integer> holes = new TreeMap<Integer, Integer>();
-
-        for(Pothole p : potholes){
-            Integer zip = p.getZip();
-            boolean complete = p.completed();
-            if(zip > 60000 && complete){
-                if(! holes.containsKey(zip)) {
-                    holes.put(zip, 1);
+        for(Pothole p : Settings.getPotholes()){
+            boolean valid = false;
+            if(newFilter.equals("All")){
+                valid = true;
+            } else if(newFilter.equals("2011") && p.getDate() == 2011){
+                valid = true;
+            } else if(newFilter.equals("2012") && p.getDate() == 2012){
+                valid = true;
+            } else if(newFilter.equals("2013") && p.getDate() == 2013){
+                valid = true;
+            }
+            if(valid == true){
+                Integer zip = p.getZip();
+                boolean complete = p.completed();
+                if(zip > 60000 && complete){
+                    if(! holes.containsKey(zip)) {
+                        holes.put(zip, 1);
+                    }
+                    Integer zipCount = holes.get(zip);
+                    holes.put(zip, zipCount + 1);
                 }
-                Integer zipCount = holes.get(zip);
-                holes.put(zip, zipCount + 1);
             }
         }
 
@@ -104,8 +146,7 @@ public class FXMLDocumentController implements Initializable {
         }
         
         chart.getData().add(filledHoles);
-
-        
-    }    
+    }
     
 }
+

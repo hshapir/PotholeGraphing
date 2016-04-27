@@ -23,7 +23,7 @@ class Pothole {
     
     public int getDate() {
         if(completion_date.contains("2013")){
-            return 2015;
+            return 2013;
         } else if(completion_date.contains("2012")){
             return 2012;
         } else if(completion_date.contains("2011")){
