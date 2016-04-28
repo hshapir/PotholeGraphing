@@ -34,4 +34,9 @@ public class PotholeGraphing extends Application {
         launch(args);
     }
     
+    @Override
+    public void stop() {
+        Settings.save();
+    }
+    
 }

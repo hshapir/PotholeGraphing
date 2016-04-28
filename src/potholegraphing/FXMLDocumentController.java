@@ -69,7 +69,10 @@ public class FXMLDocumentController implements Initializable, ChangeListener<Str
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         filterChoice.setItems(FXCollections.observableArrayList("All", "2011", "2012", "2013"));
-        filterChoice.setValue("All");
+        if(Settings.getFilterValue() == null){
+            Settings.setFilterValue("All");
+        }
+        filterChoice.setValue(Settings.getFilterValue());
         filterChoice.getSelectionModel().selectedItemProperty().addListener(this);
         if(Settings.getPotholes() == null){
             refreshData();
