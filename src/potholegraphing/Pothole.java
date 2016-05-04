@@ -5,11 +5,13 @@
  */
 package potholegraphing;
 
+import java.io.Serializable;
+
 /**
  *
  * @author csstudent
  */
-class Pothole {
+class Pothole implements Serializable{
     private int zip;
     private String completion_date;
     private String status;

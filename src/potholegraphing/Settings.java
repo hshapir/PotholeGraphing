@@ -12,8 +12,8 @@ import java.io.*;
 public class Settings implements java.io.Serializable {
     public transient static Settings instance;
     private Settings() {}
-    private static Pothole[] potholes;
-    private static String filterValue;
+    private Pothole[] potholes;
+    private String filterValue;
     
     public static void init() {
         if(instance == null) {
@@ -21,18 +21,18 @@ public class Settings implements java.io.Serializable {
             {
                 FileInputStream fileIn = new FileInputStream("settings.ser");
                 ObjectInputStream in = new ObjectInputStream(fileIn);
-                instance = (Settings) in.readObject();
+                Settings.instance = (Settings) in.readObject();
                 in.close();
                 fileIn.close();
             }catch(IOException i)
             {
-            instance = new Settings();
+            Settings.instance = new Settings();
             return;
-      }catch(ClassNotFoundException c)
-      {
-         System.out.println("Settings class not found");
-         c.printStackTrace();
-         return;
+            }catch(ClassNotFoundException c)
+            {
+            System.out.println("Settings class not found");
+            c.printStackTrace();
+            return;
       }
         }
     }
@@ -43,7 +43,7 @@ public class Settings implements java.io.Serializable {
         {
          FileOutputStream fileOut = new FileOutputStream("settings.ser");
          ObjectOutputStream out = new ObjectOutputStream(fileOut);
-         out.writeObject(instance);
+         out.writeObject(Settings.instance);
          out.close();
          fileOut.close();
          System.out.printf("Serialized data is saved in settings.ser");
@@ -55,22 +55,22 @@ public class Settings implements java.io.Serializable {
     
     public static String getFilterValue() {
         init();
-        return instance.filterValue;
+        return Settings.instance.filterValue;
     }
     
     public static void setFilterValue(String s) {
         init();
-        instance.filterValue = s;
+        Settings.instance.filterValue = s;
     }
     
     public static Pothole[] getPotholes(){
         init();
-        return instance.potholes;
+        return Settings.instance.potholes;
     }
     
     public static void setPotholes(Pothole[] ps){
         init();
-        instance.potholes = ps;
+        Settings.instance.potholes = ps;
     }
     
 }
